@@ -1,6 +1,5 @@
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -18,7 +17,7 @@ class MyApp extends StatelessWidget {
         title: 'Namer App',
         theme: ThemeData(
           useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 34, 181, 255)),
         ),
         home: MyHomePage(),
       ),
@@ -62,10 +61,8 @@ class _MyHomePageState extends State<MyHomePage> {
 switch (selectedIndex) {
   case 0:
     page = GeneratorPage();
-    break;
   case 1:
-    page = Placeholder();
-    break;
+    page = FavoritesPage();
   default:
     throw UnimplementedError('no widget for $selectedIndex');
 }
@@ -77,7 +74,7 @@ switch (selectedIndex) {
             children: [
               SafeArea(
                 child: NavigationRail(
-                  extended: false,
+                  extended: constraints.maxWidth >=600,
                   destinations: [
                     NavigationRailDestination(
                       icon: Icon(Icons.home),
@@ -184,6 +181,34 @@ class BigCard extends StatelessWidget {
           semanticsLabel: "${pair.first} ${pair.second}",
         ),
       ),
+    );
+  }
+}
+
+class FavoritesPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+
+    if (appState.favorites.isEmpty) {
+      return Center(
+        child: Text('No favorites yet.'),
+      );
+    }
+
+    return ListView(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(20),
+          child: Text('You have '
+              '${appState.favorites.length} favorites:'),
+        ),
+        for (var pair in appState.favorites)
+          ListTile(
+            leading: Icon(Icons.favorite),
+            title: Text(pair.asLowerCase),
+          ),
+      ],
     );
   }
 }
